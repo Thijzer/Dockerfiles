@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.9
 
 RUN \
  echo "**** install runtime packages ****" && \
@@ -34,6 +34,7 @@ RUN \
     php7-posix \
 	php7-redis \
     php7-session \
+	php7-sodium \
 	php7-sqlite3 \
     php7-xml \
 	php7-xmlreader \

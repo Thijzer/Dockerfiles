@@ -1,11 +1,9 @@
-FROM lsiobase/nginx:3.9
+FROM thijs/php-apache:7.3
 
 # set version label
 ARG BUILD_DATE
 ARG VERSION
 ARG NEXTCLOUD_RELEASE
-LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-LABEL maintainer="sparklyballs"
 
 # environment settings
 ENV NEXTCLOUD_PATH="/config/www/nextcloud"
@@ -19,7 +17,7 @@ RUN \
 	g++ \
 	gcc \
 	make \
-	php7-dev \
+	tar \
 	re2c \
 	samba-dev \
 	zlib-dev && \
@@ -27,75 +25,19 @@ RUN \
  apk add --no-cache --upgrade \
 	curl \
 	ffmpeg \
-	imagemagick \
-	libxml2 \
-	php7-apcu \
-	php7-bz2 \
-	php7-ctype \
-	php7-curl \
-	php7-dom \
-	php7-exif \
-	php7-ftp \
-	php7-gd \
-	php7-gmp \
-	php7-iconv \
-	php7-imagick \
-	php7-imap \
-	php7-intl \
-	php7-ldap \
-	php7-mcrypt \
-	php7-memcached \
-	php7-opcache \
-	php7-pcntl \
-	php7-pdo_mysql \
-	php7-pdo_pgsql \
-	php7-pdo_sqlite \
-	php7-pgsql \
-	php7-phar \
-	php7-posix \
-	php7-redis \
-	php7-sodium \
-	php7-sqlite3 \
-	php7-xmlreader \
-	php7-zip \
 	samba-client \
-	sudo \
-	tar \
 	unzip && \
- echo "**** compile smbclient ****" && \
- git clone git://github.com/eduardok/libsmbclient-php.git /tmp/smbclient && \
- cd /tmp/smbclient && \
- phpize7 && \
- ./configure \
-	--with-php-config=/usr/bin/php-config7 && \
- make && \
- make install && \
- echo "**** configure php and nginx for nextcloud ****" && \
- echo "extension="smbclient.so"" > /etc/php7/conf.d/00_smbclient.ini && \
- echo 'apc.enable_cli=1' >> /etc/php7/conf.d/apcu.ini && \
- sed -i \
-	-e 's/;opcache.enable.*=.*/opcache.enable=1/g' \
-	-e 's/;opcache.interned_strings_buffer.*=.*/opcache.interned_strings_buffer=8/g' \
-	-e 's/;opcache.max_accelerated_files.*=.*/opcache.max_accelerated_files=10000/g' \
-	-e 's/;opcache.memory_consumption.*=.*/opcache.memory_consumption=128/g' \
-	-e 's/;opcache.save_comments.*=.*/opcache.save_comments=1/g' \
-	-e 's/;opcache.revalidate_freq.*=.*/opcache.revalidate_freq=1/g' \
-	-e 's/;always_populate_raw_post_data.*=.*/always_populate_raw_post_data=-1/g' \
-	-e 's/memory_limit.*=.*128M/memory_limit=512M/g' \
-		/etc/php7/php.ini && \
- sed -i \
-	'/opcache.enable=1/a opcache.enable_cli=1' \
-		/etc/php7/php.ini && \
- echo "env[PATH] = /usr/local/bin:/usr/bin:/bin" >> /etc/php7/php-fpm.conf && \
+pecl install smbclient && \
+echo "extension=smbclient.so" > /php/conf.d/smbclient.ini && \
  echo "**** set version tag ****" && \
  if [ -z ${NEXTCLOUD_RELEASE+x} ]; then \
  	NEXTCLOUD_RELEASE=$(curl -s https://download.nextcloud.com/server/installer/setup-nextcloud.php \
-	| awk -F \' '/NC_VERSION/{print $4;exit}'); \
+	| awk -F \' '/NC_VERSION/{print $4;exit}); \
  fi && \
  echo ${NEXTCLOUD_RELEASE} > /version.txt && \
  echo "**** cleanup ****" && \
  apk del --purge \
-	build-dependencies && \
+	build-dependencies tar unzip curl && \
  rm -rf \
 	/tmp/*
 
@@ -103,5 +45,5 @@ RUN \
 COPY root/ /
 
 # ports and volumes
-EXPOSE 443
+EXPOSE 80
 VOLUME /config /data
