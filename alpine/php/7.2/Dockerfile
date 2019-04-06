@@ -36,6 +36,9 @@ RUN \
     php7-session \
 	php7-sodium \
 	php7-sqlite3 \
+	php7-tokenizer \
+	php7-xmlwriter \
+	php7-simplexml \
     php7-xml \
 	php7-xmlreader \
 	php7-zip && \
@@ -59,4 +62,3 @@ RUN \
 rm -rf /tmp/*
 
 EXPOSE 9000
-CMD ["php-fpm"]
