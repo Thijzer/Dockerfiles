@@ -10,4 +10,6 @@ RUN curl --silent --fail --location --retry 3 --output /tmp/master.zip --url htt
     && cd /app/sauron-master && ./run/install.sh \
     && rm -f /tmp/master.zip
 
+VOLUME /project
+
 WORKDIR /app/sauron-master
