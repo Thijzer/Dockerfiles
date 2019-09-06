@@ -2,34 +2,13 @@ FROM php:7.3-cli-alpine
 
 ENV PHP_REDIS_VERSION 5.0.2
 # persistent / runtime deps
-ENV PHPIZE_DEPS \
-    autoconf \
-    cmake \
-    file \
-    g++ \
-    gcc \
-    libc-dev \
-    pcre-dev \
-    make \
-    git \
-    pkgconf \
-    re2c
-
-RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS
-
-RUN git clone --branch ${PHP_REDIS_VERSION} https://github.com/phpredis/phpredis /tmp/phpredis \
-    && cd /tmp/phpredis \
-    && phpize \
-    && ./configure \
-    && make \
-    && make install \
-    && make test
-COPY config/redis.ini /usr/local/etc/php/conf.d/
-
-RUN apk del .build-deps \
-    && rm -rf /tmp/* \
-    && rm -rf /app \
-    && mkdir /app
+ENV EXT_DEPS icu-dev autoconf g++ make
+RUN set -eux; \
+    apk add --update icu; \
+    apk add --no-cache --virtual .ext-deps ${EXT_DEPS}; \
+    pecl install redis; \
+    apk del .ext-deps; \
+    rm -rf /tmp/*;
 
 RUN \
  echo "**** install runtime packages ****" && \
@@ -90,7 +69,7 @@ RUN \
 		/etc/php7/php.ini && \
  echo "env[PATH] = /usr/local/bin:/usr/bin:/bin" >> /etc/php7/php-fpm.conf && \
  echo "**** cleanup ****" && \
-rm -rf /tmp/*
+ rm -rf /tmp/*
 
 VOLUME ["/app"]
 WORKDIR /app
