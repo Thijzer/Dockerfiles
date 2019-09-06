@@ -24,6 +24,7 @@ RUN git clone --branch ${PHP_REDIS_VERSION} https://github.com/phpredis/phpredis
     && make \
     && make install \
     && make test
+COPY config/redis.ini /usr/local/etc/php/conf.d/
 
 RUN apk del .build-deps \
     && rm -rf /tmp/* \
