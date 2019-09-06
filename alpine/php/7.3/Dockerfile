@@ -1,14 +1,4 @@
-FROM php:7.3-cli-alpine
-
-ENV PHP_REDIS_VERSION 5.0.2
-# persistent / runtime deps
-ENV EXT_DEPS icu-dev autoconf g++ make
-RUN set -eux; \
-    apk add --update icu; \
-    apk add --no-cache --virtual .ext-deps ${EXT_DEPS}; \
-    pecl install redis; \
-    apk del .ext-deps; \
-    rm -rf /tmp/*;
+FROM php:7.3-fpm-alpine
 
 RUN \
  echo "**** install runtime packages ****" && \
@@ -71,5 +61,5 @@ RUN \
  echo "**** cleanup ****" && \
  rm -rf /tmp/*
 
-VOLUME ["/app"]
-WORKDIR /app
+EXPOSE 9000
+CMD ["php-fpm"]
