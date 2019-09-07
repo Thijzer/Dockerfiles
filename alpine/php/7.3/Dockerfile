@@ -1,5 +1,17 @@
 FROM php:7.3-fpm-alpine
 
+ENV EXT_DEPS icu-dev autoconf g++ make
+
+RUN \
+ echo "**** installing redis ****" && \
+ set -eux; \
+    apk add --update icu; \
+    apk add --no-cache --virtual .ext-deps ${EXT_DEPS}; \
+    pecl install -o -f redis; \
+    docker-php-ext-enable redis.so; \
+    pecl clear-cache; \
+    apk del .ext-deps;
+
 RUN \
  echo "**** install runtime packages ****" && \
  apk add --no-cache --virtual .persistent-deps \
@@ -32,7 +44,6 @@ RUN \
 	php7-phar \
     php7-phpdbg \
     php7-posix \
-	php7-redis \
     php7-session \
 	php7-sodium \
 	php7-sqlite3 \
