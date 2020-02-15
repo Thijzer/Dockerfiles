@@ -72,5 +72,8 @@ RUN \
  echo "**** cleanup ****" && \
  rm -rf /tmp/*
 
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer 
+
 EXPOSE 9000
+
 CMD ["php-fpm"]
