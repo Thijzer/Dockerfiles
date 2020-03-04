@@ -1,4 +1,4 @@
-FROM thijs/akeneo-php-5.6
+FROM thijs/php:akeneo-php-5.6
 
 # Install Apache + mod_php and some PHP extensions
 RUN apt-get update && \
