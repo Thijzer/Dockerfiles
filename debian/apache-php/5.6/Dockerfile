@@ -1,5 +1,4 @@
-FROM akeneo/php:5.6
-MAINTAINER Damien Carcel <damien.carcel@akeneo.com>
+FROM thijs/akeneo-php-5.6
 
 # Install Apache + mod_php and some PHP extensions
 RUN apt-get update && \
