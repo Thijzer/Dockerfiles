@@ -13,11 +13,20 @@ RUN \
     apk del .ext-deps;
 
 RUN \
+ echo "**** installing apcu ****" && \
+ set -eux; \
+    apk add --update icu; \
+    apk add --no-cache --virtual .ext-deps ${EXT_DEPS}; \
+    pecl install -o -f apcu; \
+	docker-php-ext-enable apcu --ini-name 10-docker-php-ext-apcu.ini; \
+    pecl clear-cache; \
+    apk del .ext-deps;
+
+RUN \
  echo "**** install runtime packages ****" && \
  apk add --no-cache --virtual .persistent-deps \
 	imagemagick \
 	libxml2 \
-	php7-apcu \
 	php7-bz2 \
 	php7-ctype \
 	php7-curl \
@@ -52,24 +61,15 @@ RUN \
 	php7-simplexml \
     php7-xml \
 	php7-xmlreader \
-	php7-zip && \
- echo "**** configure php ****" && \
- echo 'apc.enable_cli=1' >> $PHP_INI_DIR/conf.d/apcu.ini && \
- sed -i \
-	-e 's/;opcache.enable.*=.*/opcache.enable=1/g' \
-	-e 's/;opcache.interned_strings_buffer.*=.*/opcache.interned_strings_buffer=8/g' \
-	-e 's/;opcache.max_accelerated_files.*=.*/opcache.max_accelerated_files=10000/g' \
-	-e 's/;opcache.memory_consumption.*=.*/opcache.memory_consumption=128/g' \
-	-e 's/;opcache.save_comments.*=.*/opcache.save_comments=1/g' \
-	-e 's/;opcache.revalidate_freq.*=.*/opcache.revalidate_freq=1/g' \
-	-e 's/;always_populate_raw_post_data.*=.*/always_populate_raw_post_data=-1/g' \
-	-e 's/memory_limit.*=.*128M/memory_limit=512M/g' \
-		$PHP_INI_DIR/conf.d/app.ini && \
- echo "**** cleanup ****" && \
- rm -rf /tmp/*
+	php7-zip && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer 
+RUN \
+ echo "**** configure php ****"; \
+ echo "memory_limit=512M" > $PHP_INI_DIR/conf.d/90-php.ini; \
+ echo "extension=apcu.so" >> $PHP_INI_DIR/conf.d/90-php.ini; \
+ echo "post_max_size=80M" >> $PHP_INI_DIR/conf.d/90-php.ini; \
+ echo "upload_max_filesize=60M" >> $PHP_INI_DIR/conf.d/90-php.ini;
 
-EXPOSE 9000
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 CMD ["php-fpm"]
