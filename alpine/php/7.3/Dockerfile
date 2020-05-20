@@ -54,7 +54,7 @@ RUN \
 	php7-xmlreader \
 	php7-zip && \
  echo "**** configure php ****" && \
- echo 'apc.enable_cli=1' >> /etc/php7/conf.d/apcu.ini && \
+ echo 'apc.enable_cli=1' >> $PHP_INI_DIR/conf.d/apcu.ini && \
  sed -i \
 	-e 's/;opcache.enable.*=.*/opcache.enable=1/g' \
 	-e 's/;opcache.interned_strings_buffer.*=.*/opcache.interned_strings_buffer=8/g' \
@@ -64,15 +64,11 @@ RUN \
 	-e 's/;opcache.revalidate_freq.*=.*/opcache.revalidate_freq=1/g' \
 	-e 's/;always_populate_raw_post_data.*=.*/always_populate_raw_post_data=-1/g' \
 	-e 's/memory_limit.*=.*128M/memory_limit=512M/g' \
-		/etc/php7/php.ini && \
- sed -i \
-	'/opcache.enable=1/a opcache.enable_cli=1' \
-		/etc/php7/php.ini && \
- echo "env[PATH] = /usr/local/bin:/usr/bin:/bin" >> /etc/php7/php-fpm.conf && \
+		$PHP_INI_DIR/conf.d/app.ini && \
  echo "**** cleanup ****" && \
  rm -rf /tmp/*
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer 
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer 
 
 EXPOSE 9000
 
