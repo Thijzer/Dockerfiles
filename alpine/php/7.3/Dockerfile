@@ -18,7 +18,6 @@ RUN \
     apk add --update icu; \
     apk add --no-cache --virtual .ext-deps ${EXT_DEPS}; \
     pecl install -o -f apcu; \
-	docker-php-ext-enable apcu --ini-name 10-docker-php-ext-apcu.ini; \
     pecl clear-cache; \
     apk del .ext-deps;
 
@@ -27,6 +26,7 @@ RUN \
  apk add --no-cache --virtual .persistent-deps \
 	imagemagick \
 	libxml2 \
+	php7-bcmath \
 	php7-bz2 \
 	php7-ctype \
 	php7-curl \
