@@ -10,7 +10,11 @@ RUN \
     pecl install -o -f redis; \
     docker-php-ext-enable redis.so; \
     pecl clear-cache; \
-    apk del .ext-deps;
+    docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/; \
+    docker-php-ext-install gd bcmath exif intl; \
+    docker-php-ext-enable redis.so imagick; \
+    apk del .ext-deps; \
+    apk del $PHPIZE_DEPS
 
 RUN \
  echo "**** installing apcu ****" && \
