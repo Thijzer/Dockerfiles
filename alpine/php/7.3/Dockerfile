@@ -63,5 +63,3 @@ RUN \
     rm -rf /tmp/* /var/cache/apk/*
 
 EXPOSE 9000
-
-CMD ["php-fpm"]
