@@ -1,4 +1,4 @@
-FROM thijs/php-apache:7.3
+FROM thijs/php:alpine-php-7.4-nginx
 
 # set version label
 ARG BUILD_DATE
