@@ -7,8 +7,13 @@ RUN echo 'http://dl-4.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositor
     less \
     vim \
     nginx \
+    imagemagick \
     ca-certificates \
     php7-fpm \
+    php7-exif \
+    php7-iconv \
+    php7-fileinfo \
+	php7-imagick \
     php7-json \
     php7-zlib \
     php7-zip \
